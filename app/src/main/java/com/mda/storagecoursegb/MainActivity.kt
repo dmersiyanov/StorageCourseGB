@@ -1,7 +1,10 @@
 package com.mda.storagecoursegb
 
+import android.Manifest.permission.READ_MEDIA_IMAGES
+import android.content.ContentUris
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +20,17 @@ class MainActivity : AppCompatActivity() {
             loadImage(uri)
         }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Log.i("tag", getAllImages().toString())
+            } else {
+                Log.i("tag", getAllImages().toString())
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
@@ -27,10 +41,41 @@ class MainActivity : AppCompatActivity() {
         binding.btnSelect.setOnClickListener {
             showImagePicker()
         }
+
+        requestPermissionLauncher.launch(READ_MEDIA_IMAGES)
+
     }
 
     private fun showImagePicker() {
         pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
+
+    private fun getAllImages(): List<Uri> {
+        val images = mutableListOf<Uri>()
+        val projection = arrayOf(MediaStore.Images.Media._ID)
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+
+        val cursor = contentResolver.query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            projection,
+            null,
+            null,
+            sortOrder
+        )
+
+        cursor?.use {
+            val idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val contentUri = ContentUris.withAppendedId(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    id
+                )
+                images.add(contentUri)
+            }
+        }
+
+        return images
     }
 
     private fun loadImage(uri: Uri?) {
