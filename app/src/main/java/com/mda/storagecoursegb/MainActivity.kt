@@ -1,6 +1,5 @@
 package com.mda.storagecoursegb
 
-import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.content.ContentUris
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +9,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import coil.load
 import com.mda.storagecoursegb.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val pickMediaLauncher =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-            loadImage(uri)
+            showImage(uri)
         }
 
     private val requestPermissionLauncher =
@@ -41,8 +41,13 @@ class MainActivity : AppCompatActivity() {
         binding.btnSelect.setOnClickListener {
             showImagePicker()
         }
+        binding.btnSave.setOnClickListener {
+            showImage()
+        }
 
-        requestPermissionLauncher.launch(READ_MEDIA_IMAGES)
+//        requestPermissionLauncher.launch(READ_MEDIA_IMAGES)
+
+        showImage()
 
     }
 
@@ -50,10 +55,15 @@ class MainActivity : AppCompatActivity() {
         pickMediaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
+    private fun showImage() {
+        binding.ivImage.load("https://i.ibb.co/6gMwbsp/image.jpg")
+    }
+
     private fun getAllImages(): List<Uri> {
         val images = mutableListOf<Uri>()
         val projection = arrayOf(MediaStore.Images.Media._ID)
         val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
+        MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
 
         val cursor = contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -78,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         return images
     }
 
-    private fun loadImage(uri: Uri?) {
+    private fun showImage(uri: Uri?) {
         if (uri != null) {
             Log.d("PhotoPicker", "Selected URI: $uri")
             binding.ivImage.setImageURI(uri)
