@@ -7,20 +7,23 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
+import androidx.documentfile.provider.DocumentFile
 import com.mda.storagecoursegb.databinding.ActivityMainBinding
 import java.io.File
+import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val tag = "MainActivity"
     private val createDocLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) { uri: Uri? ->
             writeFileToSharedStorage(uri)
+        }
+
+    private val openDocLauncher =
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
+            readFileFromUri(uri)
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,17 +33,16 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        startCreateFileContract()
+        binding.btnCreateDoc.setOnClickListener {
+            launchCreateFileContract()
+        }
 
+        binding.btnOpenDoc.setOnClickListener {
+            openDocLauncher.launch(arrayOf("text/plain"))
+        }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
-    }
-
-    private fun startCreateFileContract() {
+    private fun launchCreateFileContract() {
         // Объявляем имя файла
         val filename = "my_shared_file"
         createDocLauncher.launch(filename)
@@ -72,6 +74,18 @@ class MainActivity : AppCompatActivity() {
                 os.write(fileContents.toByteArray())
             }
             Log.i(tag, uri.toString())
+        }
+    }
+
+    private fun readFileFromUri(uri: Uri?) {
+        uri?.let {
+            val documentFile = DocumentFile.fromSingleUri(this, it)
+            if (documentFile?.canRead() == true) {
+                contentResolver.openInputStream(documentFile.uri)?.use { ips ->
+                    val content = ips.readBytes().toString(Charset.defaultCharset())
+                    Log.i(tag, content)
+                }
+            }
         }
     }
 }
