@@ -7,16 +7,21 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnOpenDoc"
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etFileName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Open doc" />
+        android:hint="File name" />
+
+    <androidx.appcompat.widget.AppCompatEditText
+        android:id="@+id/etFileContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="File content" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCreateDoc"
+        android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create doc" />
-
+        android:text="Save to file" />
 </androidx.appcompat.widget.LinearLayoutCompat>
