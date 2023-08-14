@@ -1,6 +1,5 @@
 package com.mda.storagecoursegb
 
-import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.documentfile.provider.DocumentFile
 import com.mda.storagecoursegb.databinding.ActivityMainBinding
-import java.io.File
 import java.nio.charset.Charset
 
 class MainActivity : AppCompatActivity() {
@@ -47,22 +45,6 @@ class MainActivity : AppCompatActivity() {
         val filename = "my_shared_file"
         createDocLauncher.launch(filename)
     }
-
-    private fun writeFileToPrivateStorage() {
-        // создаем файл
-        val filename = "myfile"
-
-        val file = File(this.filesDir, filename)
-
-        // запись в файл
-        val fileContents = "Hello world!"
-        this.openFileOutput(filename, Context.MODE_PRIVATE).use {
-            it.write(fileContents.toByteArray())
-        }
-
-        Log.i(tag, file.path)
-    }
-
 
     private fun writeFileToSharedStorage(uri: Uri?) {
         // Объявляем содержимое файла
