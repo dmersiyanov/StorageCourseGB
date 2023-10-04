@@ -5,12 +5,14 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.mda.storagecoursegb.room.model.Driver
+import com.mda.storagecoursegb.room.model.DriverPassengerCrossRef
+import com.mda.storagecoursegb.room.model.Office
 import com.mda.storagecoursegb.room.model.Passenger
 import com.mda.storagecoursegb.room.model.TaxiCompany
 
 
 @Database(
-    entities = [TaxiCompany::class, Driver::class, Passenger::class],
+    entities = [TaxiCompany::class, Driver::class, Office::class, Passenger::class, DriverPassengerCrossRef::class],
     version = 1,
     exportSchema = true
 )
@@ -25,6 +27,7 @@ object Database {
 
     object Tables {
         const val TAXI_COMPANIES = "taxi_companies"
+        const val OFFICES = "offices"
         const val DRIVERS = "drivers"
         const val PASSENGERS = "passengers"
     }
